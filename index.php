@@ -1,31 +1,21 @@
 <?php
-namespace AbstractFactory;
 
-use AbstractFactory\Db\MySQL;
-use AbstractFactory\Db\Oracle;
-use AbstractFactory\Db\PostgresSQL;
-use AbstractFactory\Factory\MySQLRepositoryFactory;
-use AbstractFactory\Factory\OracleRepositoryFactory;
-use AbstractFactory\Factory\PostgresRepositoryFactory;
-use AbstractFactory\Service\Service;
+namespace Decorator;
+use Decorator\Decorators\EmailDecorator;
+use Decorator\Decorators\ViberDecorator;
+use Decorator\Enity\Message;
 
-spl_autoload_register(function ($className) {
-    $className = str_replace("\\", DIRECTORY_SEPARATOR, $className);
-    $className = preg_replace('/^AbstractFactory/', '', $className);
-    require_once __DIR__ . DIRECTORY_SEPARATOR . $className . '.php';
+
+spl_autoload_register(function($class) {
+    $ds = DIRECTORY_SEPARATOR;
+    $class = preg_replace('/^Decorator/', '', $class);
+    $filename = __DIR__ . str_replace('\\', $ds, $class) . '.php';
+    require_once $filename;
 });
 
-// добавление продукта в MySQL
-$mySQLRepositoryFactory = new MySQLRepositoryFactory(new MySQL());
-$serviceWithMySQLRepositories = new Service($mySQLRepositoryFactory);
-$serviceWithMySQLRepositories->addProduct();
 
-// добавление продукта в Postgres
-$PostgresSQLRepositoryFactory = new PostgresRepositoryFactory(new PostgresSQL());
-$serviceWithPostgresSQLRepositories = new Service($PostgresSQLRepositoryFactory);
-$serviceWithPostgresSQLRepositories->addProduct();
+$emailDecorator =  new EmailDecorator(new Message('Email Content'));
+echo $emailDecorator->render() . '<br>';
+$viberDecorator = new ViberDecorator(new Message('Viber Content'));
+echo $viberDecorator->render() . '<br>';
 
-// добавление продукта в Oracle
-$OracleRepositoryFactory = new OracleRepositoryFactory(new Oracle());
-$serviceWithOracleRepositories = new Service($OracleRepositoryFactory);
-$serviceWithOracleRepositories->addProduct();
