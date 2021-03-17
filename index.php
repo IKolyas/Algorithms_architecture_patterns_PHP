@@ -1,38 +1,38 @@
 <?php
+require_once 'sort.php';
+require_once 'search.php';
 
-namespace Observers;
+const RAND_LEN = 1000000;
 
-
-use Observers\Entity\JobExchange;
-use Observers\Entity\User;
-use Observers\Observer\JobObserver;
-
-spl_autoload_register(function ($class) {
-    $ds = DIRECTORY_SEPARATOR;
-    $class = preg_replace('/^Observers/', '', $class);
-    $filename = __DIR__ . str_replace('\\', $ds, $class) . '.php';
-    require_once $filename;
-});
+//1. Создать массив на миллион элементов и отсортировать его различными способами. Сравнить скорости.
+$testArray1 = arrRand(RAND_LEN);
+$timerStart = microtime(true);
+$sort1 = sortPHP($testArray1);
+echo 'сортировка PHP: ' . (microtime(true) - $timerStart) . '<br>';
 
 
-$job = new JobExchange();
+$testArray2 = arrRand(RAND_LEN);
+$timerStart = microtime(true);
+$sort1 = rsortPHP($testArray2);
+echo 'сортировка в обратном порядке PHP: ' . (microtime(true) - $timerStart) . '<br>';
 
 
-$user1 = new User('Pavel', 'pavel22@mail.ru', '5');
-$user2 = new User('Nikola', 'Nikola@mail.ru', '12');
-$user3 = new User('Vlad', 'Vlad@mail.ru', '8');
+$testArray3 = arrRand(RAND_LEN);
+$timerStart = microtime(true);
+$sort1 = asortPHP($testArray3);
+echo 'сортировка с сохранением ключ - значение PHP: ' . (microtime(true) - $timerStart) . '<br>';
 
-$observer1 = new JobObserver($user1);
-$observer2 = new JobObserver($user2);
-$observer3 = new JobObserver($user3);
 
-$job->attach($observer1);
-$job->attach($observer3);
+//2. удаление элемента из массива с применением различных алгоритмов поиска.
+//3. Подсчитать практически количество шагов при поиске описанными в методичке алгоритмами.
+$testArray4 = arrRand(RAND_LEN);
+array_push($testArray4, 12);
+$timerStart = microtime(true);
+$arrUnset = interpolationSearch($testArray4, 12);
+echo 'удалено ' . $arrUnset . ' элементов из массива --' . (microtime(true) - $timerStart) . '<br>';
 
-$job->addJob('PHP', 'требуется web разработчик');
-$job->notify();
-
-$job->detach($observer3);
-
-$job->addJob('Python', 'требуется Python разработчик');
-$job->notify();
+$testArray5 = arrRand(RAND_LEN);
+array_push($testArray5, 12);
+$timerStart = microtime(true);
+$arrUnset = binarySearch($testArray5, 12);
+echo 'удалено ' . $arrUnset . ' элементов из массива --' . (microtime(true) - $timerStart) . '<br>';
